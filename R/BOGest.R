@@ -2,7 +2,7 @@ BOGest <-
 function(data, data_type, cog_file, conditional, alternative, 
 fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 {   
-	anthracis_adjpval <- NULL
+	anthracis_iron <- NULL
 	anthracis <- NULL
 	brucella <- NULL
 	coxiella <- NULL
@@ -11,18 +11,18 @@ fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 	francisella <- NULL
 	
 	if(is.null(data)){
-		cat( "Data file is not specified so that the default simulated anthracis data is being loaded.\n")
-		data(anthracis_adjpval,envir = environment())
-		dime_data <- get("anthracis_adjpval",envir = environment())
+		cat( "Data file is not specified so that the default anthracis data is being loaded.\n")
+		data(anthracis_iron,envir = environment())
+		dime_data <- get("anthracis_iron",envir = environment())
 		data_type="adj.pval"
 	}else if(is.data.frame(data)){
 		if(is.numeric(data[[1]])) stop("BOG : The fisrt element of data frame should be character")
 		if(!is.numeric(data[[2]])) stop("BOG : The second elemnt of data frame should be numeric")
 		dime_data=data	
 	}else{
-		if(tolower(data) %in% c("anthracis_adjpval")) {
-		data(anthracis_adjpval,envir = environment())
-		dime_data <- get("anthracis_adjpval",envir = environment())
+		if(tolower(data) %in% c("anthracis_iron")) {
+		data(anthracis_iron,envir = environment())
+		dime_data <- get("anthracis_iron",envir = environment())
 		data_type="adj.pval"
 		}else dime_data <- read.table(file=data,header = TRUE)
 	}

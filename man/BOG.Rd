@@ -90,7 +90,7 @@ The number of repitions in fitting an ensemble of mixture models. The default is
 \examples{
 	library(hash)
 	library(DIME)
-	bog=BOG(data="anthracis_adjpval",data_type="adj.pval",cog_file="anthracis",
+	bog=BOG(data="anthracis_iron",data_type="adj.pval",cog_file="anthracis",
 	conditional=FALSE,gsea=FALSE)
 }
 

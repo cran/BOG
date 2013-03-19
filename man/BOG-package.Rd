@@ -12,8 +12,8 @@ It is designed to identify COG (Cluster of Orthologous Groups) that are either o
 \tabular{ll}{
 Package: \tab BOG\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2013-3-1\cr
+Version: \tab 1.1\cr
+Date: \tab 2013-3-19\cr
 License: \tab GPL-3\cr
 }
 
