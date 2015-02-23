@@ -1,22 +1,17 @@
 Package: BOG
 Type: Package
-Title: Bacterium and virus analysis of Orthologous Groups (BOG) is a
-        package for identifying differentially regulated genes in the
-        light of gene functions.
-Version: 1.1
-Date: 2013-03-19
-Author: Jincheol Park, Cenny Taslim, Shili Lin, The Ohio State
-        University
-Maintainer: Jincheol Park <park.1750@mbi.osu.edu>
-Description: It is designed to identify COG (Cluster of Orthologous
-        Groups) that are either over or under-represented among genes
-        that show differential expression under two different
-        conditions using statistical analysis and graphical
-        representations.
+Title: Bacterium and Virus Analysis of Orthologous Groups (BOG) is a
+        Package for Identifying Differentially Regulated Genes in the
+        Light of Gene Functions
+Version: 2.0
+Date: 2015-02-23
+Author: Jincheol Park (Keimyung University, South Korea), Cenny Taslim, Shili Lin (The Ohio State University, USA)
+Maintainer: Jincheol Park <park.jincheol@gmail.com>
+Description: An implementation of three statistical tests for identification of COG (Cluster of Orthologous Groups) that are over represented among genes that show differential expression under conditions. It also provides tabular and graphical summaries of the results for easy visualisation and presentation. 
 LazyLoad: yes
-Depends: R(>= 2.10.0), hash, DIME
+Depends: R(>= 3.1.2), hash, DIME
 License: GPL-3
-Packaged: 2013-03-19 16:00:52 UTC; park.1750
+Packaged: 2015-03-03 13:05:15 UTC; paul
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-03-19 17:43:31
+Date/Publication: 2015-03-03 14:32:46

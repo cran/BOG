@@ -4,7 +4,7 @@
 gseaplot
 }
 \description{
-This is the command to visualize GSEA (Gene set enrichment analysis). The GSEA takes all genes into account by constructing a test statistic based on their local-fdr without pre-selection of threshold.  
+This is the command to visualize the path of GSEA scores. The GSEA takes all genes into account by constructing a test statistic based on their local-fdr without pre-selection of threshold.  
 }
 \usage{
 gseaplot(x, cat = NULL)
@@ -15,8 +15,7 @@ This is a bog object.
 }
   \item{cat}{
 To plot an enrichment score behavior, a user needs to specify a cat argument from one of COG groups. 
-The default of cat is set NULL to raise BOG specific warning instead of R-system warning when a user fogets to specify COG. 
-The warning message is ""BOG : Category needs to be specified.""
+The default of cat is set NULL to raise BOG specific warning instead of R-system warning when a user fogets to specify COG, which should match one of the COGs specified in the input file or in the built-in files. The warning message is ""BOG : Category needs to be specified.""
 }
 }
 \references{

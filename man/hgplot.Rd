@@ -4,8 +4,8 @@
 hgplot
 }
 \description{
-A user can visualize hypergeometric test using this command.
-It display the most significant COG groups (p-value < 0.1) with observed and expected counts displayed. 
+A user can visualize the hypergeometric test results using this command.
+It display the most significant COG groups (adjusted p-value < 0.1) with observed and expected counts displayed. 
 }
 \usage{
 hgplot(x)
@@ -17,8 +17,6 @@ This is a BOG object.
 }
 }
 \examples{
-	library(hash)
-	library(DIME)
-	bog=BOG(gsea=FALSE,gsea.fdr.alpha=0.05)
+	bog=BOG(gsea=FALSE)
 	hgplot(bog)
 }

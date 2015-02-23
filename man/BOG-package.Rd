@@ -6,22 +6,22 @@
 BOG is a package for identifying differentially regulated genes in the light of gene functions.
 }
 \description{
-It is designed to identify COG (Cluster of Orthologous Groups) that are either over or under-represented among genes that show differential expression under two different conditions using statistical analysis and graphical representations. Particular statistical analysis includes the hypergeometric test, Mann-Whitney test, and Gene set enrichment analysis (GSEA) test. The results are then organized and presented graphically for easy visualization and understanding.
+The BOG package is designed to identify COG (Cluster of Orthologous Groups) that are over represented among genes that show differential expression under two different conditions using statistical analysis and graphical representations. Particular statistical analysis includes the hypergeometric test (HG), Mann-Whitney rank sum test (RANK), and Gene set enrichment analysis test (GSEA). The results are then organized and presented tabularly and graphically for easy visualization and presentation.
 }
 \details{
 \tabular{ll}{
 Package: \tab BOG\cr
 Type: \tab Package\cr
-Version: \tab 1.1\cr
-Date: \tab 2013-3-19\cr
+Version: \tab 1.0\cr
+Date: \tab 2015-2-23\cr
 License: \tab GPL-3\cr
 }
 
 }
 \author{
-Jincheol Park, Cenny Taslim, Shili Lin, The Ohio State University
+Jincheol Park (Keimyung University, South Korea), Cenny Taslim, Shili Lin (The Ohio State University, USA)
 
-Maintainer: Jincheol Park <park.1750@mbi.osu.edu>
+Maintainer: Jincheol Park <park.jincheol@gmail.com>
 }
 \references{
 Carlson, P. et al. (2009) Transcriptional Profiling of Bacillus anthracis Sterne (34F2) during Iron Starvation. PLOS ONE 4(9): e6988. Doi:10.1371/journal.pone.0006988.

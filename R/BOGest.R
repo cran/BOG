@@ -1,6 +1,5 @@
 BOGest <-
-function(data, data_type, cog_file, conditional, alternative, 
-fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
+function(data, data.type, cog.file, hg.thresh, gsea, DIME.K, DIME.iter, DIME.rep)
 {   
 	anthracis_iron <- NULL
 	anthracis <- NULL
@@ -11,10 +10,10 @@ fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 	francisella <- NULL
 	
 	if(is.null(data)){
-		cat( "Data file is not specified so that the default anthracis data is being loaded.\n")
+		cat( "The default anthracis data has been loaded because data file was not specified.\n")
 		data(anthracis_iron,envir = environment())
 		dime_data <- get("anthracis_iron",envir = environment())
-		data_type="adj.pval"
+		data.type="pval"
 	}else if(is.data.frame(data)){
 		if(is.numeric(data[[1]])) stop("BOG : The fisrt element of data frame should be character")
 		if(!is.numeric(data[[2]])) stop("BOG : The second elemnt of data frame should be numeric")
@@ -23,19 +22,19 @@ fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 		if(tolower(data) %in% c("anthracis_iron")) {
 		data(anthracis_iron,envir = environment())
 		dime_data <- get("anthracis_iron",envir = environment())
-		data_type="adj.pval"
+		data.type="pval"
 		}else dime_data <- read.table(file=data,header = TRUE)
 	}
 	
-	if(is.null(cog_file)){
-		cat( "COG file is not specified so that the default Anthracis COG data is uploaded.\n")
+	if(is.null(cog.file)){
+		cat( "The default anthracis COG has been uploaded because COG file was not specified.\n")
 		data(anthracis,envir = environment())
 		db_cogs <- get("anthracis",envir = environment())
-	}else if(is.data.frame(cog_file)){
-			db_cogs=cog_file
+	}else if(is.data.frame(cog.file)){
+			db_cogs=cog.file
 	}else{	
-			if(tolower(cog_file) %in% c("anthracis","brucella","coxiella","difficile","ecoli","francisella")){
-				switch(tolower(cog_file),
+			if(tolower(cog.file) %in% c("anthracis","brucella","coxiella","difficile","ecoli","francisella")){
+				switch(tolower(cog.file),
 				"anthracis"={data(anthracis,envir = environment());db_cogs <- get("anthracis",envir = environment())},
 				"brucella"={data(brucella,envir = environment());db_cogs <- get("brucella",envir = environment())},
 				"coxiella"={data(coxiella,envir = environment());db_cogs <- get("coxiella",envir = environment())},
@@ -44,8 +43,8 @@ fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 				"francisella"={data(francisella,envir = environment());db_cogs <- get("francisella",envir = environment())},
 				)
 			}else {
-				cat("Reading COG information from",cog_file,"\n")	
-				db_cogs <- read.table(file=cog_file,header = TRUE)
+				cat("Reading COG information from",cog.file,"\n")	
+				db_cogs <- read.table(file=cog.file,header = TRUE)
 			}
   	}
 		
@@ -61,25 +60,18 @@ fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 	iter=DIME.iter
 	rep=DIME.rep
 		
-	switch(data_type,
+	switch(data.type,
 		"data"={	
 			fit_dime=DIME(dime_list,gng.K=k,inudge.K=k,gng.max.iter=iter,gng.rep=rep,
 				inudge.max.iter=iter,inudge.rep=rep,nudge.max.iter=iter,nudge.rep=rep)
 			best_fdr=fit_dime$best$fdr
 			best_fdr=best_fdr/max(best_fdr)
 		},
-		"raw.pval"={
+		"pval"={
 			if(min(unlist(dime_list))<0) stop("There is a negative p-value")
-			if(max(unlist(dime_list))>1) stop("There is a p-value greater than 1")
-			pval_sort=sort(unlist(dime_list),decreasing=FALSE,index.return=TRUE)
-			adj_pval=p.adjust(pval_sort$x,method="BH")
+            pval_sort=sort(unlist(dime_list),decreasing=FALSE,index.return=TRUE)
+			adj_pval=pval_sort$x/max(pval_sort$x)
 			best_fdr=adj_pval[order(pval_sort$ix)]
-			fit_dime <- NULL
-		},
-		"adj.pval"={
-			if(min(unlist(dime_list))<0) stop("There is a negative p-value")
-			if(max(unlist(dime_list))>1) stop("There is a p-value greater than 1")
-			best_fdr=unlist(dime_list)
 			fit_dime <- NULL
 		}
 	)
@@ -87,15 +79,14 @@ fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 	
 ########################	
 	best_fdr[best_fdr<1e-12]=1e-12;
-	signed_fdr=best_fdr*sign(dime_data[[2]])
-	
-	f.dime=as.data.frame(list(dime_data,best_fdr=best_fdr,signed_fdr=signed_fdr))
+
+	f.dime=as.data.frame(list(dime_data,best_fdr=best_fdr))
 	f.cog=as.data.frame(db_cogs)
 	f.dc=merge(f.dime,f.cog,by=names(f.cog)[1])
 	
-	quality.data=f.dc[substr(f.dc[,5],1,3)=="COG",]
+	quality.data=f.dc[substr(f.dc[,4],1,3)=="COG",]
 	
-	###########quality_data = (geneID, log_ratio, best_fdr, signed_fdr, COG)
+	###########quality_data = (geneID, log_ratio, best_fdr) #, signed_fdr, COG)
 	###########dime = (geneID, best_fdr, signed_fdr)
 	dime=list(quality.data[,1],quality.data[,3],quality.data[,4])
 	
@@ -103,26 +94,14 @@ fdr.cutoff, gsea,gsea.fdr.alpha,DIME.K,DIME.iter,DIME.rep)
 	
 	index=c(1:length(dime[[1]]))
 	deGene <- dime[[1]] 
-	de_cogs <- quality.data[,5]
+	de_cogs <- quality.data[,4]
 	tmp <- unlist(deGene);
 	expr <- tmp 
-
-	if(conditional==TRUE){
-		min.log=min(-log(dime[[2]]))
-		s = (-log(dime[[2]])-min.log) /max(-log(dime[[2]])-min.log)*sign(dime[[3]])
-		db_Gene <- list(index=index,id=deGene,cog=de_cogs,fdr= dime[[3]],gsea=s)
 	
-		if(alternative=="both.expr"){
-			stat1=BOGstat(db_Gene,conditional,"over.expr",fdr.cutoff,gsea,gsea.fdr.alpha)
-			stat2=BOGstat(db_Gene,conditional,"under.expr",fdr.cutoff,gsea,gsea.fdr.alpha)
-			stat=list(stat1,stat2)
-		}else stat=BOGstat(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)	
-	}else{
-			min.log=min(-log(dime[[2]]))
-			s = (-log(dime[[2]])-min.log) /max(-log(dime[[2]])-min.log)
-			db_Gene <- list(index=index,id=deGene,cog=de_cogs,fdr= dime[[2]],gsea=s)
-			stat=BOGstat(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
-	}
-	
+	min.log=min(-log(dime[[2]]))
+	s = (-log(dime[[2]])-min.log) /max(-log(dime[[2]])-min.log)
+	db_Gene <- list(index=index,id=deGene,cog=de_cogs,fdr= dime[[2]],gsea=s)
+	stat=BOGstat(db_Gene,hg.thresh,gsea)
+			
 	list(stat=stat,dime=fit_dime,dime_data=dime_list)	
 }

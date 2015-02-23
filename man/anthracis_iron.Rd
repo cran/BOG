@@ -5,9 +5,9 @@
 anthracis_iron
 }
 \description{
-This is the actual anthracis data of (Carson et.al,2009) with adjusted p-value produced by DIME. 
+This is the anthracis data of (Carson et.al,2009) with adjusted p-value produced by DIME. 
 It consists of anthracis geneID and adjusted p-value for gene expression between two conditions. 
-If a user does not specify the data argument in BOG() command, this built-in data will be loaded by default.
+If a user does not specify the data argument in BOG() command, this built-in data will be loaded by default as an example.
 }
 \usage{data(anthracis_iron)}
 \format{

@@ -4,8 +4,8 @@
 DIMEplot
 }
 \description{
-It visualize the best fitted mixture model and enables a user to evaluate the fitted mixure model graphically.
-Inset in the plot shows a zoomed-in plot of individual components of the model.
+This function provides visualization for the best fitted mixture model and enables a user to evaluate the fitted mixure model graphically.
+Inset in the plot shows a zoomed-in plot of individual components of the model. This is relevant only if data.type="data".
 }
 \usage{
 DIMEplot(x)

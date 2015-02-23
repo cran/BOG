@@ -1,34 +1,14 @@
 BOGstat <-
-function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)	
+function(db_Gene,hg.thresh,gsea)	
 {	
 	all_cog_type=toupper(letters)
-	if(conditional==TRUE){
-		if(alternative=="over.expr") fdr.cutoff=abs(fdr.cutoff) 
-		if(alternative=="under.expr") fdr.cutoff=-abs(fdr.cutoff)
-		switch(alternative,
-			"over.expr"={
-				tmp_refID_cogs <- db_Gene[[3]][db_Gene[[4]]>0]
-				filter_fdr <- db_Gene[[4]][db_Gene[[4]]>0]
-				alt_index=db_Gene[[1]][db_Gene[[4]]>0]
-				filter <- rep(0,length(filter_fdr))
-				filter[filter_fdr<fdr.cutoff]<-1
-			},
-			"under.expr"= {
-				tmp_refID_cogs <- db_Gene[[3]][db_Gene[[4]]<0]
-				filter_fdr <- db_Gene[[4]][db_Gene[[4]]<0]
-				alt_index=db_Gene[[1]][db_Gene[[4]]<0]
-				filter <- rep(0,length(filter_fdr))
-				filter[filter_fdr>fdr.cutoff]<-1
-			},
-		)
-	}else{		
-		fdr.cutoff=abs(fdr.cutoff)
-		tmp_refID_cogs <- db_Gene[[3]]
-		filter_fdr <- db_Gene[[4]]
-		alt_index=db_Gene[[1]]
-		filter <- rep(0,length(filter_fdr))
-		filter[filter_fdr<fdr.cutoff]<-1
-	}	 
+    hg.thresh=abs(hg.thresh)
+    tmp_refID_cogs <- db_Gene[[3]]
+    filter_fdr <- db_Gene[[4]]
+    alt_index=db_Gene[[1]]
+    filter <- rep(0,length(filter_fdr))
+    filter[filter_fdr<hg.thresh]<-1
+ 
 
 	if(sum(filter)==0) stop ("BOG : Filter is zero so that there is no genes belonging to alternative")
 	
@@ -59,7 +39,8 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 	for (i in 1:length(refID_cat)){
 		k=refID_cat[i][[1]]
 		if(length(k)!=0 && has.key(k,h_ref) && k != "-" && k!=" "){v=values(h_ref,keys=k,USE.NAMES=FALSE)+1
-		.set(h_ref,k,v)
+            .set(h_ref,k,v)
+            #h_ref$k=v
 		tlwirn_ref=tlwirn_ref+length(k)}
 	}
 	
@@ -74,7 +55,8 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 		k=de_cat[i][[1]]
 		if(length(k)!=0 && has.key(k,h) && k != "-"){
 			v=values(h,keys=k,USE.NAMES=FALSE)+1
-			.set(h,k,v)
+            .set(h,k,v)
+            #h$k=v
 			tlwirn = tlwirn +length(k)
 		}
 	}  
@@ -90,7 +72,8 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 		v_ref=values(h_ref,keys=k,USE.NAMES=FALSE)
 		not_v_ref=tlwirn_ref-v_ref
 		pval= phyper(v-1,v_ref,not_v_ref,tlwirn,lower.tail=FALSE)
-		.set(h_hyper,k,pval)
+        .set(h_hyper,k,pval)
+        #h_hyper$k=pval
 	}
 	
 	
@@ -108,7 +91,8 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 				v=values(h_rank,keys=km,USE.NAMES=FALSE)
 				vrank=filter_fdr[i]
 				nv=append(v,vrank)	
-				.set(h_rank,km,nv)
+                .set(h_rank,km,nv)
+                #h_rank$km=nv
 				tlwirn_rank = tlwirn_rank +1
 			}
 		}
@@ -144,18 +128,8 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 			subfdrx=fdr_all[selectx]
 			selecty=total_select[! total_select %in% selectx]
 			subfdry=fdr_all[selecty]
-			if(conditional==TRUE){
-				switch(alternative,
-				"over.expr"={
-					wtest=wilcox.test(subfdrx,subfdry,alternative="less")
-				},
-				"under.expr"={
-					wtest=wilcox.test(subfdrx,subfdry,alternative="greater")
-				}
-				)
-			} else wtest=wilcox.test(subfdrx,subfdry,alternative="less")
-			
-			.set(rank_test,all_cog_type[i],wtest$p.value)	
+			wtest=wilcox.test(subfdrx,subfdry,alternative="less")#####
+            .set(rank_test,all_cog_type[i],wtest$p.value)
 		}
 	}
 	
@@ -166,7 +140,7 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 	aindex=alt_index[!is.na(tmp_refID_cogs)]
 	an=length(aindex)
 	s_remNoCat=abs(db_Gene$gsea[aindex]) 
-	s.sort = sort(s_remNoCat,decreasing=TRUE,index.return=TRUE)
+	s.sort = sort(s_remNoCat,decreasing=TRUE,index.return=TRUE) 
 	
 	n.ac=length(actual_cog)
 	map=hash(actual_cog,c(1:n.ac))
@@ -241,14 +215,13 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 		
 		# calculate raw p-value
 		pval = apply(as.matrix(1:n.ac),1,
-		  function(x) sum(es_rand[[x]]$max_es > max_delta[x])/ran.n);  
+		  function(x) sum(es_rand[[x]]$max_es > max_delta[x])/ran.n); 
+		pval[pval==0.0]=0.001	
 		t(data.frame(pval,row.names=actual_cog));
 		
 		
 		pval_sort=sort(pval,decreasing=FALSE,index.return=TRUE);
 		adj_pval=p.adjust(pval_sort$x,method="BH")
-		reject=pval_sort$ix[adj_pval<gsea.fdr.alpha]
-	
 	}
 	
 	actual_hyper=sort(values(h_hyper,key=actual_cog,USE.NAMES=FALSE),index.return=TRUE)
@@ -260,36 +233,29 @@ function(db_Gene,conditional,alternative,fdr.cutoff,gsea,gsea.fdr.alpha)
 	rank.adj_pval=p.adjust(actual_rank$x)
 	
 	hyper_frame=data.frame(cog=hyper_cog,pval=actual_hyper$x,hyper.adj_pval)
-	colnames(hyper_frame)=c("COG","pvalue","adj pval")
+	colnames(hyper_frame)=c("COG","p.value","adj.pval")
 	rank_frame=data.frame(cog=rank_cog,pval=actual_rank$x,rank.adj_pval)
-	colnames(rank_frame)=c("COG","pvalue","adj pval")
+	colnames(rank_frame)=c("COG","p.value","adj.pval")
 	
 	plot_list=list(h=h,h_ref=h_ref,actual_cog=actual_cog,h_hyper=h_hyper,h_rank=h_rank,map=map,
-	delta=delta,fdr.cutoff=fdr.cutoff,S_location=S_location)
+	delta=delta,hg.thresh=hg.thresh,S_location=S_location)
 	
 	if(gsea==TRUE){
 		plot_list=list(h=h,h_ref=h_ref,actual_cog=actual_cog,h_hyper=h_hyper,h_rank=h_rank,map=map,
-		delta=delta,fdr.cutoff=fdr.cutoff,S_location=S_location)
+		delta=delta,hg.thresh=hg.thresh,S_location=S_location)
 		gsea.statistic=max_delta[pval_sort$ix]
 		gsea.raw.pval=pval_sort
 		gsea.adj.pval=adj_pval
 		gsea_cog=actual_cog[pval_sort$ix]
 		gsea_frame=data.frame(cog=gsea_cog,stat=gsea.statistic,raw=gsea.raw.pval$x,adj=gsea.adj.pval)
-		colnames(gsea_frame)=c("COG","statistic","raw pval","adj pval")
-	}else plot_list=list(h=h,h_ref=h_ref,actual_cog=actual_cog,h_hyper=h_hyper,h_rank=h_rank,fdr.cutoff=fdr.cutoff)
+		colnames(gsea_frame)=c("COG","statistic","p.val","adj.pval")
+	}else plot_list=list(h=h,h_ref=h_ref,actual_cog=actual_cog,h_hyper=h_hyper,h_rank=h_rank,hg.thresh=hg.thresh)
 	
-	if(conditional==TRUE){
-		if(gsea==TRUE) {
-			result=list(hyper=hyper_frame,rank=rank_frame,gsea=gsea_frame,plot=plot_list,alternative=alternative,conditional=conditional)
-		}else {
-			result=list(hyper=hyper_frame,rank=rank_frame,plot=plot_list,alternative=alternative,conditional=conditional)
-		}
-	}else{
+
 		 if(gsea==TRUE) {
-			result=list(hyper=hyper_frame,rank=rank_frame,gsea=gsea_frame,plot=plot_list,conditional=conditional)
+			result=list(hyper=hyper_frame,rank=rank_frame,gsea=gsea_frame,plot=plot_list) #,conditional=conditional)
 		}else {
-			result=list(hyper=hyper_frame,rank=rank_frame,plot=plot_list,conditional=conditional)
+			result=list(hyper=hyper_frame,rank=rank_frame,plot=plot_list)
 		}
-	}
 	result
 }
